@@ -1,9 +1,40 @@
 ﻿@page "/"
+@using FeverBeaver.Models
+@using FeverBeaver.Pages.Home
+@inject Blazored.LocalStorage.ILocalStorageService _localStorage
+@inject IDialogService _dialogService
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<MudContainer MaxWidth="MaxWidth.Small">
+    @foreach (var person in _persons)
+    {
+        <div>@person.Name</div>
+    }
+</MudContainer>
 
-Welcome to your new app.
+<MudFab 
+    OnClick="OpenDialog"
+    Style="position: fixed; right: 2rem; bottom: 2rem;" 
+    Color="Color.Primary" 
+    StartIcon="@Icons.Material.Filled.Add" />
 
-<SurveyPrompt Title="How is Blazor working for you?"/>
+
+@code {
+    
+    private List<Person> _persons = new List<Person>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        await _localStorage.SetItemAsync("test", "test");
+    }
+
+    private void OpenDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        _dialogService.Show<AddPersonDialog>("Add Person", options);
+    }
+
+}
