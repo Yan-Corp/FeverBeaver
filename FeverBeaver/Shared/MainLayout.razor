@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider/>
+<MudThemeProvider Theme="_theme"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
@@ -20,9 +20,23 @@
 </MudLayout>
 @code {
     bool _drawerOpen = true;
-
+    private MudTheme? _theme;
+    
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _theme = new MudTheme
+        {
+            Palette =
+            {
+                Background = Colors.Grey.Lighten4
+            }
+        };
+    }
+
 }

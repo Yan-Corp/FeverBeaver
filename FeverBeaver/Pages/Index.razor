@@ -6,35 +6,79 @@
 
 <PageTitle>Home</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Small">
-    @foreach (var person in _persons)
-    {
-        <div>@person.Name</div>
-    }
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudGrid Spacing="2" Justify="Justify.Center">
+
+        @foreach (var person in _persons)
+        {
+            <MudItem>
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@person.Name</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton Icon="@Icons.Material.Filled.History" Color="Color.Default"/>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>Advil at @person.Advils.Last()</MudText>
+                        <MudText>Tylenol at @person.Tylenols.Last()</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => AdministerMedication(person.Id, Medications.ADVIL)">Take Advil</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => AdministerMedication(person.Id, Medications.TYLENOL)">Take Tylenol</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
 </MudContainer>
 
-<MudFab 
+<MudFab
     OnClick="OpenDialog"
-    Style="position: fixed; right: 2rem; bottom: 2rem;" 
-    Color="Color.Primary" 
-    StartIcon="@Icons.Material.Filled.Add" />
+    Style="position: fixed; right: 2rem; bottom: 2rem;"
+    Color="Color.Primary"
+    StartIcon="@Icons.Material.Filled.Add"/>
 
 
 @code {
-    
-    private List<Person> _persons = new List<Person>();
+
+    private List<Person> _persons = new();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        
-        await _localStorage.SetItemAsync("test", "test");
+
+        _persons = await _localStorage.GetItemAsync<List<Person>>("persons");
     }
 
     private void OpenDialog()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var options = new DialogOptions {CloseOnEscapeKey = true};
         _dialogService.Show<AddPersonDialog>("Add Person", options);
+    }
+
+    private async Task AdministerMedication(string personId, string medication)
+    {
+        if (personId == null) throw new ArgumentNullException(nameof(personId));
+
+        var person = _persons.FirstOrDefault(p => p.Id == personId);
+        if (person == null) throw new ArgumentNullException(nameof(person));
+
+        switch (medication.ToLowerInvariant())
+        {
+            case Medications.ADVIL:
+                person.Advils.Add(DateTime.Now);
+                break;
+            case Medications.TYLENOL:
+                person.Tylenols.Add(DateTime.Now);
+                break;
+            default:
+                throw new ArgumentException("Invalid medication", nameof(medication));
+        }
+
+        await _localStorage.SetItemAsync("persons", _persons);
     }
 
 }

@@ -9,8 +9,6 @@
         <DataAnnotationsValidator/>
         <MudTextField Label="Name" HelperText="Max. 16 characters"
                       @bind-Value="_model.Name" For="@(() => _model.Name)"/>
-        <MudNumericField Label="Age" 
-                         @bind-Value="_model.Age" For="@(() => _model.Age)"/>
     </DialogContent>
     <DialogActions>
         <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
