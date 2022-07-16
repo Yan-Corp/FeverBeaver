@@ -3,22 +3,25 @@
 
 @inject Blazored.LocalStorage.ILocalStorageService _localStorage
 
-        <EditForm Model="@_model" OnValidSubmit="@OnValidSubmit">
-<MudDialog>
-    <DialogContent>
-        <DataAnnotationsValidator/>
-        <MudTextField Label="Name" HelperText="Max. 16 characters"
-                      @bind-Value="_model.Name" For="@(() => _model.Name)"/>
-    </DialogContent>
-    <DialogActions>
-        <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add Person</MudButton>
-    </DialogActions>
-</MudDialog>
-        </EditForm>
+<EditForm Model="@_model" OnValidSubmit="@OnValidSubmit">
+    <MudDialog>
+        <DialogContent>
+            <DataAnnotationsValidator/>
+            <MudTextField Label="Name" HelperText="Max. 16 characters"
+                          @bind-Value="_model.Name" For="@(() => _model.Name)"/>
+        </DialogContent>
+        <DialogActions>
+            <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Add Person</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
+
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    
+
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+
     private Person _model = new Person();
 
     private void Cancel() => MudDialog.Cancel();
@@ -26,7 +29,7 @@
     private async Task OnValidSubmit(EditContext context)
     {
         StateHasChanged();
-        
+
         var persons = await _localStorage.GetItemAsync<List<Person>>("persons") ?? new List<Person>();
 
         persons.Add(_model);
@@ -34,4 +37,5 @@
         await _localStorage.SetItemAsync("persons", persons);
         MudDialog.Close(DialogResult.Ok(true));
     }
+
 }
